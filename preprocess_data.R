@@ -29,3 +29,10 @@ march_less <- select_if(march, function(x) sum(is.na(x)) < 200)
 # Save ready datasets
 save(march, file = "march.rda")
 save(march_less, file = "march_less.rda")
+# Proposition for the future:
+mlcc.preprocess <- function(data) {
+  data %>%
+    select_if(is.numeric) %>%
+    mutate_all(function(x) ifelse(is.na(x), mean(x, na.rm = T), x))
+}
+
