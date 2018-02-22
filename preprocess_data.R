@@ -34,5 +34,7 @@ mlcc.preprocess <- function(data) {
   data %>%
     select_if(is.numeric) %>%
     mutate_all(function(x) ifelse(is.na(x), mean(x, na.rm = T), x))
+  # %>% # opcjonalnie
+    # as.matrix()
 }
 
