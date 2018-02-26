@@ -2,6 +2,7 @@
 library(varclust)
 library(dplyr)
 load("march_less.rda")
+load("march_daily.rda")
 # Random initialization, all arguments set to default ----
 march_varclust <- mlcc.bic(march_less)
 # Number of clusters
@@ -62,10 +63,18 @@ print.clusters <- function(data, mlcc_object) {
     colnames_in_cluster <- colnames(data)[mlcc_object$segmentation == x]
     current_cluster_size <- length(colnames_in_cluster)
     c(colnames_in_cluster,
-      rep(NA, times = max_cluster_size - current_cluster_size))
+      rep("-", times = max_cluster_size - current_cluster_size))
   })
   tmp <- as.data.frame(tmp)
   colnames(tmp) <- paste("cluster", 1:max(mlcc_object$segmentation), sep = "_")
   tmp
 }
 print.clusters(march_less, march_varclust)
+# Daily data ----
+daily_varclust <- mlcc.bic(march_daily)
+print.clusters(march_daily, daily_varclust)
+daily_varclust$BIC
+# Bigger max.dim
+daily_varclust2 <- mlcc.bic(march_daily, max.dim = 8)
+print.cluster(march_daily, daily_varclust2)
+daily_varclust2$BIC
