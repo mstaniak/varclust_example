@@ -80,9 +80,8 @@ daily_varclust$BIC
 daily_varclust2 <- mlcc.bic(march_daily, max.dim = 8)
 print.cluster(march_daily, daily_varclust2)
 daily_varclust2$BIC
-
-# Factors within cluster2
-march_vc <- mlcc.bic(scale(march_less))
-pca <- princomp(scale(march_less)[, march_varclust$segmentation == 2])
-head(pca$loadings[, 1:4])
-head(march_vc$factors[[2]])
+# Factors within cluster 2
+# march_vc <- mlcc.bic(scale(march_less))
+# pca <- princomp(scale(march_less)[, march_varclust$segmentation == 2])
+# head(pca$loadings[, 1:4])
+# head(march_vc$factors[[2]])
