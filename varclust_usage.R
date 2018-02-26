@@ -51,11 +51,13 @@ for(i in 1:max(march_varclust_ssc2$segmentation)) {
 local_biplot <- function(data, mlcc_object, cluster) {
   if(cluster > max(mlcc_object$segmentation))
     stop("Cluster label is out of range")
-  data_new <- preprocess_data(data)
-  one_cluster <- data_new[, mlcc_object$segmentation == 1]
+  data_new <- mlcc.preprocess(data)
+  one_cluster <- data_new[, mlcc_object$segmentation == cluster]
   factors <- mlcc_object$factors[[cluster]]
-  projection <- dim(as.matrix(data_new))%*%as.matrix(factors[, 1:2])
+  projection <- factors[, 1:2]%*%solve(t(factors[, 1:2])%*%factors[, 1:2])%*%t(factors[, 1:2])
+  list(dim(projection), det(projection))
 }
+local_biplot(march_less, march_varclust, 2)
 print.clusters <- function(data, mlcc_object) {
   # Assume data is preprocessed (only numeric variables)
   max_cluster_size <- max(as.data.frame(table(mlcc_object$segmentation))$Freq)
@@ -78,3 +80,9 @@ daily_varclust$BIC
 daily_varclust2 <- mlcc.bic(march_daily, max.dim = 8)
 print.cluster(march_daily, daily_varclust2)
 daily_varclust2$BIC
+
+# Factors within cluster2
+march_vc <- mlcc.bic(scale(march_less))
+pca <- princomp(scale(march_less)[, march_varclust$segmentation == 2])
+head(pca$loadings[, 1:4])
+head(march_vc$factors[[2]])

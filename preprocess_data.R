@@ -26,6 +26,7 @@ march_na <- march %>%
   mutate(percentage_na = count_na/nrow(march))
 # Remove columns, for which less than 50% data is present
 march_less <- select_if(march, function(x) sum(is.na(x)) < 200)
+march_less <- mlcc.preprocess(march_less)
 march_daily <- months_separate[[3]] %>%
   mutate(UTC.time = as.character(UTC.time)) %>%
   mutate(UTC.time = as_date(UTC.time)) %>%
