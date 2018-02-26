@@ -85,7 +85,7 @@ daily_varclust2$BIC
 # pca <- princomp(scale(march_less)[, march_varclust$segmentation == 2])
 # head(pca$loadings[, 1:4])
 # head(march_vc$factors[[2]])
-# PCA globalnie
+# PCA for all data.
 march_pca <- princomp(march_less)
 march_pca$sdev
 plot(march_pca$sdev)
