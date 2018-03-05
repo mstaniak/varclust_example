@@ -1,6 +1,9 @@
 # Libraries & data ----
 library(varclust)
 library(dplyr)
+library(tidyr)
+library(readr)
+library(stringr)
 load("march_less.rda")
 load("march_daily.rda")
 # Random initialization, all arguments set to default ----
@@ -91,3 +94,40 @@ march_pca$sdev
 plot(march_pca$sdev)
 march_pca$sdev/sum(march_pca$sdev)
 round(cumsum(march_pca$sdev)/sum(march_pca$sdev), 2)
+# Quickly check stability
+march_vcl <- mlcc.reps(march_less, max.iter = 30)
+march_vcl2 <- mlcc.reps(march_less, max.iter = 30)
+max(march_vcl$segmentation)
+max(march_vcl2$segmentation)
+# Sensor locations
+sensor_locations <- read_csv("sensor_locations.csv")
+# march_loc <- march_less %>%
+#   gather(meas_station, value) %>%
+#   mutate(meas_station = str_replace(meas_station, "X", "")) %>%
+#   mutate(station = str_split(meas_station, "_", simplify = T)[, 1],
+#          meas = str_split(meas_station, "_", simplify = T)[, 2])
+stations_meas <- colnames(march_less)
+stations_meas <- str_replace(stations_meas, "X", "")
+stations <- str_split(stations_meas, "_", simplify = T)[, 1]
+meas <- str_split(stations_meas, "_", simplify = T)[, 2]
+stations <- tibble(id = as.integer(stations),
+                   meas = meas) %>%
+  left_join(sensor_locations, by = "id") %>%
+  mutate(segmentation1 = march_varclust$segmentation)
+print.clusters(march_less, march_varclust)
+cluster4 <- stations %>%
+  filter(segmentation1 == 4)
+cluster6 <- stations %>%
+  filter(segmentation1 == 6)
+library(ggplot2)
+library(ggmap)
+krakow_map <- get_map("https://www.google.pl/maps/place/Krak%C3%B3w/@50.0467446,19.9348338,12z/data=!3m1!4b1!4m5!3m4!1s0x471644c0354e18d1:0xb46bb6b576478abf!8m2!3d50.0646501!4d19.9449799")
+krakow_map <- get_map("Kraków")
+ggmap(krakow_map) +
+  geom_point(data = cluster4, aes(latitude, longitude),
+             size = 4, color = "red")
+ggplot() +
+  geom_point(data = cluster4, aes(latitude, longitude),
+             size = 4, color = "red") +
+  geom_point(data = cluster6, aes(latitude, longitude),
+             size = 6, color = "blue")
