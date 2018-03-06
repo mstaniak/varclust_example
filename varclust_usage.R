@@ -4,6 +4,8 @@ library(dplyr)
 library(tidyr)
 library(readr)
 library(stringr)
+library(ggplot2)
+library(ggmap)
 load("march_less.rda")
 load("march_daily.rda")
 # Random initialization, all arguments set to default ----
@@ -56,11 +58,10 @@ local_biplot <- function(data, mlcc_object, cluster) {
     stop("Cluster label is out of range")
   data_new <- mlcc.preprocess(data)
   one_cluster <- data_new[, mlcc_object$segmentation == cluster]
-  factors <- mlcc_object$factors[[cluster]]
-  projection <- factors[, 1:2]%*%solve(t(factors[, 1:2])%*%factors[, 1:2])%*%t(factors[, 1:2])
-  list(dim(projection), det(projection))
+  pca <- princomp(one_cluster)
+  biplot(pca)
 }
-local_biplot(march_less, march_varclust, 2)
+local_biplot(march_less, march_varclust, 6)
 print.clusters <- function(data, mlcc_object) {
   # Assume data is preprocessed (only numeric variables)
   max_cluster_size <- max(as.data.frame(table(mlcc_object$segmentation))$Freq)
@@ -101,11 +102,6 @@ max(march_vcl$segmentation)
 max(march_vcl2$segmentation)
 # Sensor locations
 sensor_locations <- read_csv("sensor_locations.csv")
-# march_loc <- march_less %>%
-#   gather(meas_station, value) %>%
-#   mutate(meas_station = str_replace(meas_station, "X", "")) %>%
-#   mutate(station = str_split(meas_station, "_", simplify = T)[, 1],
-#          meas = str_split(meas_station, "_", simplify = T)[, 2])
 stations_meas <- colnames(march_less)
 stations_meas <- str_replace(stations_meas, "X", "")
 stations <- str_split(stations_meas, "_", simplify = T)[, 1]
@@ -116,11 +112,13 @@ stations <- tibble(id = as.integer(stations),
   mutate(segmentation1 = march_varclust$segmentation)
 print.clusters(march_less, march_varclust)
 cluster4 <- stations %>%
-  filter(segmentation1 == 4)
+  filter(segmentation1 == 4) %>%
+  distinct(id) %>%
+  left_join(sensor_locations, by = "id")
 cluster6 <- stations %>%
-  filter(segmentation1 == 6)
-library(ggplot2)
-library(ggmap)
+  filter(segmentation1 == 6) %>%
+  distinct(id) %>%
+  left_join(sensor_locations, by = "id")
 krakow_map <- get_map("https://www.google.pl/maps/place/Krak%C3%B3w/@50.0467446,19.9348338,12z/data=!3m1!4b1!4m5!3m4!1s0x471644c0354e18d1:0xb46bb6b576478abf!8m2!3d50.0646501!4d19.9449799")
 krakow_map <- get_map("Kraków")
 ggmap(krakow_map) +
