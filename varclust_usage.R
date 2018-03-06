@@ -128,4 +128,7 @@ ggplot() +
   geom_point(data = cluster4, aes(latitude, longitude),
              size = 4, color = "red") +
   geom_point(data = cluster6, aes(latitude, longitude),
-             size = 6, color = "blue")
+             size = 6, color = "blue") +
+  geom_text(data = sensor_locations, aes(x = latitude, y = longitude,
+                                         label = id),
+            nudge_x = 0.003)
