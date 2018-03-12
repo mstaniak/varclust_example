@@ -53,7 +53,7 @@ for(i in 1:max(march_varclust_ssc2$segmentation)) {
   cat(colnames(march_less)[march_varclust$segmentation == i], "\n")
 }
 # Propositions for the future
-local_biplot <- function(data, mlcc_object, cluster) {
+local.biplot <- function(data, mlcc_object, cluster) {
   if(cluster > max(mlcc_object$segmentation))
     stop("Cluster label is out of range")
   data_new <- mlcc.preprocess(data)
@@ -61,7 +61,7 @@ local_biplot <- function(data, mlcc_object, cluster) {
   pca <- princomp(one_cluster)
   biplot(pca)
 }
-local_biplot(march_less, march_varclust, 6)
+local.biplot(march_less, march_varclust, 6)
 print.clusters <- function(data, mlcc_object) {
   # Assume data is preprocessed (only numeric variables)
   max_cluster_size <- max(as.data.frame(table(mlcc_object$segmentation))$Freq)
@@ -132,3 +132,4 @@ ggplot() +
   geom_text(data = sensor_locations, aes(x = latitude, y = longitude,
                                          label = id),
             nudge_x = 0.003)
+# TODO: same map for clustering starting from ssc
