@@ -108,8 +108,12 @@ stations <- str_split(stations_meas, "_", simplify = T)[, 1]
 meas <- str_split(stations_meas, "_", simplify = T)[, 2]
 stations <- tibble(id = as.integer(stations),
                    meas = meas) %>%
-  left_join(sensor_locations, by = "id") %>%
+  left_join(sensor_locations, by = "id")
+stations <- stations %>%
   mutate(segmentation1 = march_varclust$segmentation)
+stations <- stations %>%
+  mutate(segmentation2 = march_varclust_ssc$segmentation,
+         segmentation3 = march_varclust_ssc2$segmentation)
 print.clusters(march_less, march_varclust)
 cluster4 <- stations %>%
   filter(segmentation1 == 4) %>%
@@ -119,7 +123,6 @@ cluster6 <- stations %>%
   filter(segmentation1 == 6) %>%
   distinct(id) %>%
   left_join(sensor_locations, by = "id")
-krakow_map <- get_map("https://www.google.pl/maps/place/Krak%C3%B3w/@50.0467446,19.9348338,12z/data=!3m1!4b1!4m5!3m4!1s0x471644c0354e18d1:0xb46bb6b576478abf!8m2!3d50.0646501!4d19.9449799")
 krakow_map <- get_map("Kraków")
 ggmap(krakow_map) +
   geom_point(data = cluster4, aes(latitude, longitude),
@@ -133,3 +136,27 @@ ggplot() +
                                          label = id),
             nudge_x = 0.003)
 # TODO: same map for clustering starting from ssc
+cluster3 <- stations %>%
+  filter(segmentation3 == 3) %>%
+  distinct(id) %>%
+  left_join(sensor_locations, by = "id")
+cluster6 <- stations %>%
+  filter(segmentation3 == 6) %>%
+  distinct(id) %>%
+  left_join(sensor_locations, by = "id")
+krakow_map <- get_map("Kraków")
+ggmap(krakow_map) +
+  geom_point(data = cluster4, aes(latitude, longitude),
+             size = 4, color = "red")
+ggplot() +
+  geom_point(data = cluster3, aes(latitude, longitude),
+             size = 4, color = "red") +
+  geom_point(data = cluster6, aes(latitude, longitude),
+             size = 6, color = "blue") +
+  geom_text(data = sensor_locations, aes(x = latitude, y = longitude,
+                                         label = id),
+            nudge_x = 0.003)
+proba_stab <- lapply(1:20, function(x) {
+  tmp <- mlcc.bic(march_less)
+  max(tmp$segmentation)
+})
