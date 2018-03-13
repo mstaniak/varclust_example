@@ -52,7 +52,7 @@ for(i in 1:max(march_varclust_ssc$segmentation)) {
 for(i in 1:max(march_varclust_ssc2$segmentation)) {
   cat(colnames(march_less)[march_varclust$segmentation == i], "\n")
 }
-# Propositions for the future
+# Propositions for the future ----
 local.biplot <- function(data, mlcc_object, cluster) {
   if(cluster > max(mlcc_object$segmentation))
     stop("Cluster label is out of range")
@@ -80,7 +80,7 @@ print.clusters(march_less, march_varclust)
 daily_varclust <- mlcc.bic(march_daily)
 print.clusters(march_daily, daily_varclust)
 daily_varclust$BIC
-# Bigger max.dim
+## Bigger max.dim
 daily_varclust2 <- mlcc.bic(march_daily, max.dim = 8)
 print.cluster(march_daily, daily_varclust2)
 daily_varclust2$BIC
@@ -89,18 +89,14 @@ daily_varclust2$BIC
 # pca <- princomp(scale(march_less)[, march_varclust$segmentation == 2])
 # head(pca$loadings[, 1:4])
 # head(march_vc$factors[[2]])
-# PCA for all data.
+# PCA for all data. ----
 march_pca <- princomp(march_less)
 march_pca$sdev
 plot(march_pca$sdev)
 march_pca$sdev/sum(march_pca$sdev)
 round(cumsum(march_pca$sdev)/sum(march_pca$sdev), 2)
-# Quickly check stability
-march_vcl <- mlcc.reps(march_less, max.iter = 30)
-march_vcl2 <- mlcc.reps(march_less, max.iter = 30)
-max(march_vcl$segmentation)
-max(march_vcl2$segmentation)
-# Sensor locations
+# Maps. ----
+## Sensor locations
 sensor_locations <- read_csv("sensor_locations.csv")
 stations_meas <- colnames(march_less)
 stations_meas <- str_replace(stations_meas, "X", "")
@@ -115,6 +111,7 @@ stations <- stations %>%
   mutate(segmentation2 = march_varclust_ssc$segmentation,
          segmentation3 = march_varclust_ssc2$segmentation)
 print.clusters(march_less, march_varclust)
+## Map for random-initialized clustering.
 cluster4 <- stations %>%
   filter(segmentation1 == 4) %>%
   distinct(id) %>%
@@ -135,7 +132,7 @@ ggplot() +
   geom_text(data = sensor_locations, aes(x = latitude, y = longitude,
                                          label = id),
             nudge_x = 0.003)
-# TODO: same map for clustering starting from ssc
+## Map for SSC-initialized clustering.
 cluster3 <- stations %>%
   filter(segmentation3 == 3) %>%
   distinct(id) %>%
@@ -156,9 +153,12 @@ ggplot() +
   geom_text(data = sensor_locations, aes(x = latitude, y = longitude,
                                          label = id),
             nudge_x = 0.003)
+# Quick stability experiment. ----
 proba_stab <- lapply(1:20, function(x) {
   tmp <- mlcc.bic(march_less)
   max(tmp$segmentation)
 })
 hist(unlist(proba_stab))
 table(unlist(proba_stab))
+march_vcl <- mlcc.bic(march_less, max.iter = 30)
+max(march_vcl$segmentation)
