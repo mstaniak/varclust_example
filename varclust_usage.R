@@ -160,3 +160,5 @@ proba_stab <- lapply(1:20, function(x) {
   tmp <- mlcc.bic(march_less)
   max(tmp$segmentation)
 })
+hist(unlist(proba_stab))
+table(unlist(proba_stab))
