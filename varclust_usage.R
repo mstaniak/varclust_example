@@ -9,7 +9,8 @@ library(ggmap)
 load("march_less.rda")
 load("march_daily.rda")
 # Random initialization, all arguments set to default ----
-march_varclust <- mlcc.bic(march_less)
+march_varclust <- mlcc.bic(march_less,
+                           greedy = FALSE)
 # Number of clusters
 max(march_varclust$segmentation)
 # Display generated clusters
@@ -77,24 +78,13 @@ print.clusters <- function(data, mlcc_object) {
 }
 print.clusters(march_less, march_varclust)
 # Daily data ----
-daily_varclust <- mlcc.bic(march_daily)
+daily_varclust <- mlcc.bic(march_daily, greedy = FALSE)
 print.clusters(march_daily, daily_varclust)
 daily_varclust$BIC
 ## Bigger max.dim
-daily_varclust2 <- mlcc.bic(march_daily, max.dim = 8)
+daily_varclust2 <- mlcc.bic(march_daily, max.dim = 8, greedy = FALSE)
 print.cluster(march_daily, daily_varclust2)
 daily_varclust2$BIC
-# Factors within cluster 2
-# march_vc <- mlcc.bic(scale(march_less))
-# pca <- princomp(scale(march_less)[, march_varclust$segmentation == 2])
-# head(pca$loadings[, 1:4])
-# head(march_vc$factors[[2]])
-# PCA for all data. ----
-march_pca <- princomp(march_less)
-march_pca$sdev
-plot(march_pca$sdev)
-march_pca$sdev/sum(march_pca$sdev)
-round(cumsum(march_pca$sdev)/sum(march_pca$sdev), 2)
 # Maps. ----
 ## Sensor locations
 sensor_locations <- read_csv("sensor_locations.csv")
@@ -155,10 +145,11 @@ ggplot() +
             nudge_x = 0.003)
 # Quick stability experiment. ----
 proba_stab <- lapply(1:20, function(x) {
-  tmp <- mlcc.bic(march_less)
+  tmp <- mlcc.bic(march_less, greedy = FALSE)
   max(tmp$segmentation)
 })
 hist(unlist(proba_stab))
 table(unlist(proba_stab))
-march_vcl <- mlcc.bic(march_less, max.iter = 30)
+## Co z większą liczbą iteracji?
+march_vcl <- mlcc.bic(march_less, max.iter = 30, greedy = FALSE)
 max(march_vcl$segmentation)
