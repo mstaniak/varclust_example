@@ -74,3 +74,4 @@ cl_vcl2 <- print.clusters(march_less, every_vcl[[2]])
 cl_ssc3 <- print.clusters.vec(march_less, (every_cl[[3]])[1:263])
 cl_vcl3 <- print.clusters(march_less, every_vcl[[3]])
 
+draw.map(vclust8$segmentation, clusters = c(2, 4, 6, 7, 8))
