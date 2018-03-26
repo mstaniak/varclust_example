@@ -6,9 +6,9 @@ library(readr)
 library(stringr)
 library(ggplot2)
 library(ggmap)
-load("march_less.rda")
-load("march_daily.rda")
-load("stations.rda")
+load("data/march_less.rda")
+load("data/march_daily.rda")
+load("data/stations.rda")
 source("functions.R")
 # Random initialization, all arguments set to default ----
 march_varclust <- mlcc.bic(march_less,

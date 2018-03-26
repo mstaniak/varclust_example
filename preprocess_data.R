@@ -8,11 +8,13 @@ library(tidyr)
 # Using data downloaded from http://bit.ly/2C8oqmp ----
 # Unpack the data to the working directory.
 # Import files
-csv_files <- grep(".csv", x = list.files(), value = T) %>%
+csv_files <- grep(".csv", x = list.files(path = "./dane/"), value = T) %>%
   grep("2017", x = ., value = T)
 months_separate <- lapply(csv_files, function(x) read.csv(x))
 # Cleaning & sanity check - missing data ----
-# Remove non-numeric variables
+# Remove non-numeric variables,
+greedy = FALSE,
+greedy = FALSE
 months_separate2 <- lapply(months_separate, function(x) select_if(x, is.numeric))
 # Count missing values
 count_na <- lapply(months_separate2, function(x) sum(is.na(x)))
@@ -36,9 +38,9 @@ march_daily <- months_separate[[3]] %>%
   select_if(is.numeric) %>%
   select_if(function(x) sum(is.na(x)) <= 0.5*length(x))
 # Save ready datasets
-save(march, file = "march.rda")
-save(march_less, file = "march_less.rda")
-save(march_daily, file = "march_daily.rda")
+save(march, file = "data/march.rda")
+save(march_less, file = "data/march_less.rda")
+save(march_daily, file = "data/march_daily.rda")
 # Proposition for the future:
 mlcc.preprocess <- function(data) {
   data %>%
@@ -48,7 +50,7 @@ mlcc.preprocess <- function(data) {
     # as.matrix()
 }
 # Stations in Krakow
-sensor_locations <- read_csv("sensor_locations.csv")
+sensor_locations <- read_csv("data/sensor_locations.csv")
 stations_meas <- colnames(march_less)
 stations_meas <- str_replace(stations_meas, "X", "")
 stations <- str_split(stations_meas, "_", simplify = T)[, 1]
@@ -57,4 +59,4 @@ stations <- tibble(id = as.integer(stations),
                    meas = meas) %>%
   left_join(sensor_locations, by = "id")
 
-save(stations, file = "stations.rda")
+save(stations, file = "data/stations.rda")
