@@ -47,4 +47,14 @@ mlcc.preprocess <- function(data) {
   # %>% # opcjonalnie
     # as.matrix()
 }
+# Stations in Krakow
+sensor_locations <- read_csv("sensor_locations.csv")
+stations_meas <- colnames(march_less)
+stations_meas <- str_replace(stations_meas, "X", "")
+stations <- str_split(stations_meas, "_", simplify = T)[, 1]
+meas <- str_split(stations_meas, "_", simplify = T)[, 2]
+stations <- tibble(id = as.integer(stations),
+                   meas = meas) %>%
+  left_join(sensor_locations, by = "id")
 
+save(stations, file = "stations.rda")
