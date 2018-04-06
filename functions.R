@@ -7,7 +7,6 @@ local.biplot <- function(data, mlcc_object, cluster) {
   pca <- princomp(one_cluster)
   biplot(pca)
 }
-local.biplot(march_less, march_varclust, 6)
 print.clusters <- function(data, mlcc_object) {
   # Assume data is preprocessed (only numeric variables)
   max_cluster_size <- max(as.data.frame(table(mlcc_object$segmentation))$Freq)
