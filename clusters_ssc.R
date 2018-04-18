@@ -20,7 +20,13 @@ every_cl <- list(rep(1, 263), c(1, cl2[2:263]), cl3, cl4, cl5, cl6, cl7, cl8, cl
 every_vcl <- lapply(1:20, function(x)
                mlcc.reps(march_less, numb.clusters = x, numb.runs = 30, max.iter = 50,
                          initial.segmentations = list(every_cl[[x]][1:263])))
-lapply(every_vcl, function(x) x$BIC)
+BICs <- unlist(lapply(every_vcl, function(x) x$BIC))
+ggplot(tibble(x = 1:20, BIC = BICs), aes(x = x, y = BICs)) +
+  geom_point() +
+  theme_bw() +
+  xlab("number of clusters") +
+  ylab("BIC") +
+  ylim(c(0, 40000))
 ### The largest BIC: 19 clusters
 clusters_ssc19 <- print.clusters.vec(march_less, cl19)
 clusters_vcl9 <- print.clusters(march_less, every_vcl[[19]])
@@ -37,10 +43,19 @@ lapply(1:20, function(x) {
 ## Draw maps showing the clusterings ----
 print.clusters(march_less, every_vcl[[19]])
 ### First for pressure
-draw.map(every_vcl[[19]]$segmentation, clusters = c(5, 10, 17, 18))
+map_pressure_vcl <- draw.map(every_vcl[[19]]$segmentation,
+                             clusters = c(5, 10, 17, 18)) +
+  ggtitle("Pressure measurements clustered using varclust")
+ggsave(map_pressure_vcl, filename = "map_pressure_vcl.png")
 ### Then for particular matter
-draw.map(every_vcl[[19]]$segmentation, clusters = c(1:3, 6:8, 12:16, 19))
+map_pm_vcl <- draw.map(every_vcl[[19]]$segmentation, clusters = c(1:3, 6:8, 12:16, 19)) +
+  ggtitle("Particle matter measurements clustered using varclust")
+ggsave(map_pm_vcl, filename = "map_pm_vcl.png")
 ### Compare to SSC initial clustering
 print.clusters.vec(march_less, cl19)
-draw.map(cl19, clusters = c(5, 10, 17, 18))
-draw.map(cl19, clusters = c(1:3, 6:8, 12:16, 19))
+map_pressure_ssc <- draw.map(cl19, clusters = c(5, 10, 17, 18)) +
+  ggtitle("Pressure measurements clustered using SSC")
+ggsave(map_pressure_ssc, filename = "map_pressure_ssc.png")
+map_pm_ssc <- draw.map(cl19, clusters = c(1:3, 6:8, 12:16, 19)) +
+  ggtitle("Particle matter measurements clustered using varclust")
+ggsave(map_pm_ssc, filename = "map_pm_ssc.png")
