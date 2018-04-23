@@ -12,7 +12,10 @@ load("data/stations.rda")
 source("functions.R")
 # Random initialization, all arguments set to default ----
 march_varclust <- mlcc.bic(march_less,
-                           greedy = FALSE)
+                           deterministic = TRUE)
+march_varclust2 <- mlcc.bic(march_less,
+                           deterministic = TRUE)
+
 # Number of clusters
 max(march_varclust$segmentation)
 # Display generated clusters
