@@ -19,7 +19,8 @@ every_cl <- list(rep(1, 263), c(1, cl2[2:263]), cl3, cl4, cl5, cl6, cl7, cl8, cl
                  cl10, cl11, cl12, cl13, cl14, cl15, cl16, cl17, cl18, cl19, cl20)
 every_vcl <- lapply(1:20, function(x)
                mlcc.reps(march_less, numb.clusters = x, numb.runs = 30, max.iter = 50,
-                         initial.segmentations = list(every_cl[[x]][1:263])))
+                         initial.segmentations = list(every_cl[[x]][1:263]),
+                         deterministic = TRUE))
 BICs <- unlist(lapply(every_vcl, function(x) x$BIC))
 ggplot(tibble(x = 1:20, BIC = BICs), aes(x = x, y = BICs)) +
   geom_point() +
@@ -46,25 +47,26 @@ map_pm_vcl <- draw.map(every_vcl[[19]]$segmentation, clusters = c(1:3, 6:8, 12:1
   ggtitle("Particle matter measurements clustered using varclust")
 ggsave(map_pm_vcl, filename = "map_pm_vcl.png")
 ### Compare to SSC initial clustering
-print.clusters.vec(march_less, cl19)
-map_pm_ssc <- draw.map(cl19, clusters = c(1:3, 6:8, 12:16, 19)) +
+map_pm_ssc <- draw.map(cl10[1:263], clusters = c(1:2, 5:7, 9:10)) +
   ggtitle("Particle matter measurements clustered using varclust")
 ggsave(map_pm_ssc, filename = "map_pm_ssc.png")
+# krakow <- get_map(location = c(50.05970, 19.94139))
+# ggmap(krakow)
 ### Stability ----
-stability_mbic <- lapply(seq(20, 100, 10), function(x) {
-  cat("\n")
-  tibble(numb_runs = x,
-         mbic_vals = sapply(1:10, function(y) {
-           cat(".")
-           mlcc.bic(march_less, numb.clusters = 10,
-                    numb.runs = x)$BIC
-  }))
-})
-save(stability_mbic, file = "stability_mbic.rda")
-mbic_plot <- bind_rows(stability_mbic) %>%
-  ggplot(aes(x = reorder(as.character(numb_runs), numb_runs), y = mbic_vals)) +
-    geom_boxplot() +
-    theme_bw() +
-    ylab("mBIC") +
-    xlab("number of runs of mlcc.kmeans algorithm")
-ggsave("mbic_plot.png", mbic_plot)
+# stability_mbic <- lapply(seq(20, 100, 10), function(x) {
+#   cat("\n")
+#   tibble(numb_runs = x,
+#          mbic_vals = sapply(1:10, function(y) {
+#            cat(".")
+#            mlcc.reps(march_less, numb.clusters = 10,
+#                     numb.runs = x)$BIC
+#   }))
+# })
+# save(stability_mbic, file = "stability_mbic.rda")
+# mbic_plot <- bind_rows(stability_mbic) %>%
+#   ggplot(aes(x = reorder(as.character(numb_runs), numb_runs), y = mbic_vals)) +
+#     geom_boxplot() +
+#     theme_bw() +
+#     ylab("mBIC") +
+#     xlab("number of runs of mlcc.kmeans algorithm")
+# ggsave("mbic_plot.png", mbic_plot)
