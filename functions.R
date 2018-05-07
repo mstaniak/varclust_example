@@ -45,7 +45,8 @@ draw.map <- function(segmentation, clusters) {
       left_join(sensor_locations, by = "id") %>%
       mutate(cluster = as.character(clusters[i]))
   }
-  all <- bind_rows(clusters_list)
+  all <- bind_rows(clusters_list) %>%
+    mutate(cluster = reorder(cluster, as.numeric(cluster)))
 
   ggplot(all, aes(x = latitude, y = longitude, color = cluster)) +
     geom_point() +

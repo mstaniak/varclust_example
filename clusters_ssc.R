@@ -18,16 +18,16 @@ sensor_locations <- read_csv("./data/sensor_locations.csv")
 every_cl <- list(rep(1, 263), c(1, cl2[2:263]), cl3, cl4, cl5, cl6, cl7, cl8, cl9,
                  cl10, cl11, cl12, cl13, cl14, cl15, cl16, cl17, cl18, cl19, cl20)
 every_vcl <- lapply(1:20, function(x)
-               mlcc.reps(march_less, numb.clusters = x, numb.runs = 30, max.iter = 50,
+               mlcc.reps(march_less, numb.clusters = x, max.iter = 50,
                          initial.segmentations = list(every_cl[[x]][1:263]),
                          deterministic = TRUE))
 BICs <- unlist(lapply(every_vcl, function(x) x$BIC))
-ggplot(tibble(x = 1:20, BIC = BICs), aes(x = x, y = BICs)) +
+nclust_vs_BIC <- ggplot(tibble(x = 1:20, BIC = BICs), aes(x = x, y = BICs)) +
   geom_point() +
   theme_bw() +
   xlab("number of clusters") +
-  ylab("BIC") +
-  ylim(c(0, 40000))
+  ylab("mBIC")
+ggsave(nclust_vs_BIC, file = "nclust_vs_BIC.png")
 ### Chosen number of clusters: 10.
 clusters_ssc10 <- print.clusters.vec(march_less, cl10)
 clusters_vcl0 <- print.clusters(march_less, every_vcl[[10]])
@@ -43,13 +43,24 @@ lapply(1:20, function(x) {
 })
 ## Draw maps showing the clusterings ----
 print.clusters(march_less, every_vcl[[10]])
-map_pm_vcl <- draw.map(every_vcl[[19]]$segmentation, clusters = c(1:3, 6:8, 12:16, 19)) +
+map_pm_vcl <- draw.map(every_vcl[[10]]$segmentation, clusters = c(1:2, 5:7, 9:10)) +
   ggtitle("Particle matter measurements clustered using varclust")
 ggsave(map_pm_vcl, filename = "map_pm_vcl.png")
 ### Compare to SSC initial clustering
-map_pm_ssc <- draw.map(cl10[1:263], clusters = c(1:2, 5:7, 9:10)) +
+print.clusters.vec(march_less, every_cl[[10]])
+map_pm_ssc <- draw.map(every_cl[[10]][1:263], clusters = c(1:2, 5:7, 9:10)) +
   ggtitle("Particle matter measurements clustered using varclust")
-ggsave(map_pm_ssc, filename = "map_pm_ssc.png")
+# ggsave(map_pm_ssc, filename = "map_pm_ssc.png")
+vars_in_cluster<- print.clusters.vec(march_less, every_cl[[10]])$cluster_7
+vars_in_cluster <- vars_in_cluster[!is.na(vars_in_cluster)]
+vars_in_cluster <- vars_in_cluster[vars_in_cluster != "-"]
+cluster <- mutate_all(march_less[, vars_in_cluster],
+                         function(x) ifelse(is.na(x), mean(x, na.rm = T), x))
+pca_clust <- princomp(cluster, cor = TRUE)
+plot(pca_clust$loadings)
+plot(pca_clust$scores)
+biplot(pca_clust)
+###
 # krakow <- get_map(location = c(50.05970, 19.94139))
 # ggmap(krakow)
 ### Stability ----
