@@ -6,13 +6,14 @@ library(readr)
 library(stringr)
 library(ggplot2)
 library(ggmap)
+sensor_locations <- read_csv("data/sensor_locations.csv")
 load("data/march_less.rda")
 load("data/march_daily.rda")
 load("data/stations.rda")
 source("functions.R")
+set.seed(42)
 # Random initialization, all arguments set to default ----
-march_varclust <- mlcc.bic(march_less,
-                           deterministic = TRUE)
+march_varclust <- mlcc.bic(march_less, greedy = F)
 save(march_varclust, file = "march_varclust.rda")
 # Number of clusters
 max(march_varclust$segmentation)
@@ -23,7 +24,7 @@ for(i in 1:max(march_varclust$segmentation)) {
 print.clusters(march_less, march_varclust)
 march_varclust$BIC
 # Daily data ----
-daily_varclust <- mlcc.bic(march_daily, deterministic = TRUE)
+daily_varclust <- mlcc.bic(march_daily, greedy = F)
 print.clusters(march_daily, daily_varclust)
 max(daily_varclust$segmentation)
 daily_varclust$BIC
@@ -31,4 +32,4 @@ daily_varclust$BIC
 segmentation <- march_varclust$segmentation
 ## Map for random-initialized clustering.
 print.clusters(march_less, march_varclust)
-draw.map(segmentation, c(4, 6, 9))
+draw.map(segmentation, c(1,4,6,7,8,9))

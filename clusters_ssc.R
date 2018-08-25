@@ -10,6 +10,7 @@ library(ggmap)
 library(readr)
 source("functions.R")
 source("ssc_clusters_vecs.R")
+set.seed(42)
 load("./data/march_less.rda")
 load("./data/march_daily.rda")
 load("./data/stations.rda")
@@ -19,8 +20,7 @@ every_cl <- list(rep(1, 263), c(1, cl2[2:263]), cl3, cl4, cl5, cl6, cl7, cl8, cl
                  cl10, cl11, cl12, cl13, cl14, cl15, cl16, cl17, cl18, cl19, cl20)
 every_vcl <- lapply(1:20, function(x)
                mlcc.reps(march_less, numb.clusters = x, max.iter = 50,
-                         initial.segmentations = list(every_cl[[x]][1:263]),
-                         deterministic = TRUE))
+                         initial.segmentations = list(every_cl[[x]][1:263])))
 BICs <- unlist(lapply(every_vcl, function(x) x$BIC))
 nclust_vs_BIC <- ggplot(tibble(x = 1:20, BIC = BICs), aes(x = x, y = BICs)) +
   geom_point() +

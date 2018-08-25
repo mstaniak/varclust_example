@@ -48,7 +48,8 @@ draw.map <- function(segmentation, clusters) {
   all <- bind_rows(clusters_list) %>%
     mutate(cluster = reorder(cluster, as.numeric(cluster)))
 
-  ggplot(all, aes(x = latitude, y = longitude, color = cluster)) +
-    geom_point() +
+  krakow <- get_map(location = "cracow", maptype = "toner-lite", zoom=11)
+  ggmap(krakow) + 
+  geom_point(aes(x = longitude, y = latitude, color = cluster), all) +
     theme_bw()
 }
