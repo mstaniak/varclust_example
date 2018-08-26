@@ -13,7 +13,6 @@ csv_files <- grep(".csv", x = list.files(path = "./dane/"), value = T) %>%
 months_separate <- lapply(csv_files, function(x) read.csv(x))
 # Cleaning & sanity check - missing data ----
 # Remove non-numeric variables,
-greedy = FALSE,
 greedy = FALSE
 months_separate2 <- lapply(months_separate, function(x) select_if(x, is.numeric))
 # Count missing values

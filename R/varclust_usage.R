@@ -10,11 +10,11 @@ sensor_locations <- read_csv("data/sensor_locations.csv")
 load("data/march_less.rda")
 load("data/march_daily.rda")
 load("data/stations.rda")
-source("functions.R")
+source("R/functions.R")
 set.seed(42)
 # Random initialization, all arguments set to default ----
 march_varclust <- mlcc.bic(march_less, greedy = F)
-save(march_varclust, file = "march_varclust.rda")
+save(march_varclust, file = "data/march_varclust.rda")
 # Number of clusters
 max(march_varclust$segmentation)
 # Display generated clusters
@@ -32,4 +32,7 @@ daily_varclust$BIC
 segmentation <- march_varclust$segmentation
 ## Map for random-initialized clustering.
 print.clusters(march_less, march_varclust)
-draw.map(segmentation, c(1,4,6,7,8,9))
+map_pm_pure_vcl <- draw.map(segmentation, c(1,4,6,7,8,9)) +
+ggtitle("Particle matter measurements clustered using varclust") + 
+  theme(plot.title = element_text(hjust=0.5))
+ggsave(filename = "pictures/map_pm_pure_vcl.png", map_pm_pure_vcl, scale = 1.35)

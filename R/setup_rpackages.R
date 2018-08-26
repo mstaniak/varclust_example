@@ -13,5 +13,5 @@ my_install("ggplot2")
 my_install("ggmap")
 my_install("lubridate")
 if(!require("varclust")){
-  devtools::install_github("sjwilczynski/varclust")
+  devtools::install_github("psobczyk/varclust")
 }
